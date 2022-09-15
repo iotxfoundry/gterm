@@ -15,7 +15,7 @@ Unlike [gotty](https://github.com/yudai/gotty), we use the same terminal, so we 
 GTerm requires go1.16 or later.
 
 ```sh
-$ go install github.com/iotxfoundry/gterm@latest
+$ go install github.com/iotxfoundry/gterm/cmd/gterm@latest
 ```
 
 ## Usage
