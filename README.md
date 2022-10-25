@@ -1,8 +1,10 @@
 # GTERM - 💕Share your terminal as a web application💕
 
+[![Go Version](http://img.shields.io/github/go-mod/go-version/iotxfoundry/gterm)][gomod]
 [![GitHub release](http://img.shields.io/github/release/iotxfoundry/gterm.svg?style=flat-square)][release]
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][license]
 
+[gomod]: https://github.com/iotxfoundry/gterm/blob/master/go.md
 [release]: https://github.com/iotxfoundry/gterm/releases
 [license]: https://github.com/iotxfoundry/gterm/blob/master/LICENSE
 
