@@ -1,11 +1,10 @@
 package main
 
 import (
-	"os"
+	"flag"
+	"log"
 
 	"github.com/iotxfoundry/gterm/server"
-	"github.com/jessevdk/go-flags"
-	"github.com/sirupsen/logrus"
 )
 
 // inject by go build
@@ -14,20 +13,15 @@ var (
 	BuildTime = "2020-01-13-0802 UTC"
 )
 
+var (
+	portFlag = flag.Int("port", 8080, "http port")
+)
+
 func main() {
-	s := server.NewServer()
+	flag.Parse()
+	s := server.NewServer(*portFlag)
 	defer s.Close()
-	parser := flags.NewParser(s, flags.Default)
-	if _, err := parser.Parse(); err != nil {
-		code := 1
-		if fe, ok := err.(*flags.Error); ok {
-			if fe.Type == flags.ErrHelp {
-				code = 0
-			}
-		}
-		os.Exit(code)
-	}
 	if err := s.Serve(); err != nil {
-		logrus.WithError(err).Errorln("server serve error")
+		log.Fatalln("server serve error", err)
 	}
 }

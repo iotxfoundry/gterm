@@ -2,22 +2,23 @@ package server
 
 import (
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"sync"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Server struct {
 	sessions sync.Map // ws session
 	tty      *os.File
 	cmd      *exec.Cmd
-	Port     int `short:"p" long:"port" default:"8080" description:"http port"`
+	port     int
 }
 
-func NewServer() (s *Server) {
-	return &Server{}
+func NewServer(port int) (s *Server) {
+	return &Server{
+		port: port,
+	}
 }
 
 func (s *Server) Close() (err error) {
@@ -35,7 +36,7 @@ func (s *Server) Serve() (err error) {
 	// init ttyd
 	err = s.ttyd()
 	if err != nil {
-		logrus.WithError(err).Errorln("server init ttyd error")
+		log.Printf("server init ttyd error, %v", err)
 		return
 	}
 	var wg sync.WaitGroup
@@ -45,7 +46,7 @@ func (s *Server) Serve() (err error) {
 		go func() {
 			_, err = io.Copy(s, s.tty)
 			if err != nil {
-				logrus.WithError(err).Fatalln("copy ptyd stdout error")
+				log.Printf("copy ptyd stdout error, %v", err)
 			}
 		}()
 		s.cmd.Wait()
@@ -56,7 +57,7 @@ func (s *Server) Serve() (err error) {
 		defer wg.Done()
 		err = s.http()
 		if err != nil {
-			logrus.WithError(err).Errorln("init http server error")
+			log.Printf("init http server error, %v", err)
 		}
 	}()
 	wg.Wait()

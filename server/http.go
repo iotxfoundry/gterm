@@ -3,12 +3,12 @@ package server
 import (
 	"fmt"
 	"io/fs"
+	"log"
 	"math/rand"
 	"net/http"
 
 	"github.com/gorilla/websocket"
 	"github.com/iotxfoundry/gterm/web"
-	"github.com/sirupsen/logrus"
 )
 
 func (s *Server) http() (err error) {
@@ -19,10 +19,10 @@ func (s *Server) http() (err error) {
 	mux := http.NewServeMux()
 	mux.Handle("/", http.FileServer(http.FS(fsys)))
 	mux.HandleFunc("/v1/ws", s.HandleWebsocket)
-	logrus.Infof("http :%d start ok", s.Port)
-	err = http.ListenAndServe(fmt.Sprintf(":%d", s.Port), mux)
+	log.Printf("http :%d start ok", s.port)
+	err = http.ListenAndServe(fmt.Sprintf(":%d", s.port), mux)
 	if err != nil {
-		logrus.WithError(err).Errorf("http :%s start error", s.Port)
+		log.Printf("http :%d start error, %v", s.port, err)
 		return
 	}
 	return
@@ -44,7 +44,7 @@ func (s *Server) HandleWebsocket(rw http.ResponseWriter, r *http.Request) {
 	defer webConn.Close()
 
 	session := rand.Int31()
-	logrus.Infof("gterm [%d] web conn: %s", session, webConn.RemoteAddr())
+	log.Printf("gterm [%d] web conn: %s", session, webConn.RemoteAddr())
 	s.sessions.Store(session, webConn)
 	defer s.sessions.Delete(session)
 
@@ -54,12 +54,12 @@ func (s *Server) HandleWebsocket(rw http.ResponseWriter, r *http.Request) {
 	for {
 		_, data, err := webConn.ReadMessage()
 		if err != nil {
-			logrus.WithError(err).Errorln("ReadMessage error")
+			log.Printf("ReadMessage error, %v", err)
 			return
 		}
 		_, err = s.tty.Write(data)
 		if err != nil {
-			logrus.WithError(err).Errorln("tty write error")
+			log.Printf("tty write error, %v", err)
 			continue
 		}
 	}
@@ -70,9 +70,9 @@ func (s *Server) Write(buff []byte) (n int, err error) {
 	s.sessions.Range(func(key, value any) bool {
 		webConn, ok := value.(*websocket.Conn)
 		if ok {
-			e := webConn.WriteMessage(websocket.TextMessage, append([]byte{}, buff...))
+			e := webConn.WriteMessage(websocket.BinaryMessage, append([]byte{}, buff...))
 			if e != nil {
-				logrus.WithError(err).Errorln("websocket write error")
+				log.Printf("websocket write error, %v", err)
 			}
 		}
 		return true

@@ -1,11 +1,11 @@
 package server
 
 import (
+	"log"
 	"os"
 	"os/exec"
 
 	"github.com/creack/pty"
-	"github.com/sirupsen/logrus"
 )
 
 var Shells = []string{"bash", "sh"}
@@ -37,7 +37,7 @@ func (s *Server) ttyd() (err error) {
 	// Start the command with a pty.
 	s.tty, err = pty.Start(s.cmd)
 	if err != nil {
-		logrus.WithError(err).Errorln("pty.Start error")
+		log.Printf("pty.Start error, %v", err)
 		return
 	}
 	// Set the initial window size
@@ -50,7 +50,7 @@ func (s *Server) ttyd() (err error) {
 		Y:    0,
 	})
 	if err != nil {
-		logrus.WithError(err).Errorln("pty.Setsize error")
+		log.Printf("pty.Setsize error, %v", err)
 		return
 	}
 	return

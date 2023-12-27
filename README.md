@@ -27,14 +27,9 @@ $ go install github.com/iotxfoundry/gterm/cmd/gterm@latest
 ## Usage
 
 ```sh
-Usage:
-  gterm [OPTIONS]
-
-Application Options:
-  -p, --port= http port (default: 8080)
-
-Help Options:
-  -h, --help  Show this help message
+Usage of ./gterm:
+  -port int
+        http port (default 8080)
 ```
 
 ## License
