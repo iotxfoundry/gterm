@@ -1,32 +1,43 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <title>GTerm</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <title>gterm</title>
     <link rel="stylesheet" href="./css/xterm.css" />
-    <script src="./js/xterm.js"></script>
-    <style>
-        html,
-        body,
-        #terminal {
-            background: black;
-            height: 100%;
-            width: 100%;
-            padding: 0%;
-            margin: 0%;
+    <script type="importmap">
+      {
+        "imports": {
+          "@xterm/xterm": "./js/xterm.js",
+          "@xterm/addon-attach": "./js/addon-attach.js",
+          "@xterm/addon-clipboard": "./js/addon-clipboard.js",
+          "@xterm/addon-fit": "./js/addon-fit.js",
+          "@xterm/addon-image": "./js/addon-image.js",
+          "@xterm/addon-search": "./js/addon-search.js",
+          "@xterm/addon-serialize": "./js/addon-serialize.js",
+          "@xterm/addon-unicode": "./js/addon-unicode11.js",
+          "@xterm/addon-web-links": "./js/addon-web-links.js",
+          "@xterm/addon-webgl": "./js/addon-webgl.js"
         }
+      }
+    </script>
+    <style>
+      html,
+      body,
+      #terminal {
+        background: black;
+        height: 100%;
+        width: 100%;
+        padding: 0%;
+        margin: 0%;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="terminal"></div>
-    <script src="./js/xterm-addon-fit.js"></script>
-    <script src="./js/xterm-addon-webgl.js"></script>
-    <script src="./js/xterm-addon-attach.js"></script>
+    <script src="./js/addon-unicode11.js"></script>
     <script src="./pjs/index.js" type="module"></script>
-</body>
-
+  </body>
 </html>
