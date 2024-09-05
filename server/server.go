@@ -43,13 +43,15 @@ func (s *Server) Serve() (err error) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		go func() {
-			_, err = io.Copy(s, s.tty)
-			if err != nil {
-				log.Printf("copy ptyd stdout error, %v", err)
-			}
-		}()
-		s.cmd.Wait()
+		for {
+			go func() {
+				_, err = io.Copy(s, s.tty)
+				if err != nil {
+					log.Printf("copy ptyd stdout error, %v", err)
+				}
+			}()
+			s.cmd.Wait()
+		}
 	}()
 
 	wg.Add(1)

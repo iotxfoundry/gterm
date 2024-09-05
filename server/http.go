@@ -2,23 +2,23 @@ package server
 
 import (
 	"fmt"
-	"io/fs"
 	"log"
 	"math/rand"
 	"net/http"
+	"strconv"
 
+	"github.com/creack/pty"
 	"github.com/gorilla/websocket"
 	"github.com/iotxfoundry/gterm/web"
 )
 
+var webs = web.WebServer()
+
 func (s *Server) http() (err error) {
-	fsys, err := fs.Sub(web.WebUI, "dist")
-	if err != nil {
-		return
-	}
 	mux := http.NewServeMux()
-	mux.Handle("/", http.FileServer(http.FS(fsys)))
+	mux.Handle("/", webs)
 	mux.HandleFunc("/v1/ws", s.HandleWebsocket)
+	mux.HandleFunc("/v1/size", s.HandleSize)
 	log.Printf("http :%d start ok", s.port)
 	err = http.ListenAndServe(fmt.Sprintf(":%d", s.port), mux)
 	if err != nil {
@@ -28,8 +28,36 @@ func (s *Server) http() (err error) {
 	return
 }
 
-func (s *Server) HandleWebsocket(rw http.ResponseWriter, r *http.Request) {
+func (s *Server) HandleSize(rw http.ResponseWriter, r *http.Request) {
+	scols := r.URL.Query().Get("cols")
+	srows := r.URL.Query().Get("rows")
+	if scols == "" || srows == "" {
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	cols, e := strconv.Atoi(scols)
+	if e != nil {
+		cols = 200
+	}
+	rows, e := strconv.Atoi(srows)
+	if e != nil {
+		rows = 55
+	}
+	err := pty.Setsize(s.tty, &pty.Winsize{
+		Rows: uint16(rows),
+		Cols: uint16(cols),
+		X:    0,
+		Y:    0,
+	})
+	if err != nil {
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	log.Printf("Resized terminal to %d cols and %d rows", cols, rows)
+	rw.WriteHeader(http.StatusOK)
+}
 
+func (s *Server) HandleWebsocket(rw http.ResponseWriter, r *http.Request) {
 	var upgrade = websocket.Upgrader{
 		Subprotocols: []string{"tty"},
 	}

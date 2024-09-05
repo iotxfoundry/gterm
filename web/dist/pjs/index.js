@@ -71,9 +71,10 @@ const isWebGL2Available = () => {
   }
 };
 
+const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+const path = window.location.pathname.replace(/[\/]+$/, "");
+
 const webSocket = () => {
-  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  const path = window.location.pathname.replace(/[\/]+$/, "");
   const wsUrl = [
     protocol,
     "//",
@@ -84,6 +85,12 @@ const webSocket = () => {
   ].join("");
   const ws = new WebSocket(wsUrl, ["tty"]);
   return ws;
+};
+
+const resize = async (term) => {
+  await fetch("/v1/size?cols=" + term.cols + "&rows=" + term.rows, {
+    method: "POST",
+  });
 };
 
 (function () {
@@ -110,8 +117,10 @@ const webSocket = () => {
 
   window.addEventListener("resize", () => {
     fitAddon.fit();
+    resize(term);
   });
   fitAddon.fit();
+  resize(term);
 
   // The browser may drop WebGL contexts for various reasons like OOM or after the system has been suspended.
   // There is an API exposed that fires the webglcontextlost event fired on the canvas so embedders can handle it however they wish.

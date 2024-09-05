@@ -23,6 +23,7 @@ func FindCmd() (cmd string) {
 				continue
 			}
 			cmd = v
+			break
 		}
 	}
 	return
@@ -53,5 +54,6 @@ func (s *Server) ttyd() (err error) {
 		log.Printf("pty.Setsize error, %v", err)
 		return
 	}
+	log.Printf("Init terminal to %d cols and %d rows", cols, rows)
 	return
 }
